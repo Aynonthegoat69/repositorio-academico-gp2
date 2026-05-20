@@ -1,870 +1,310 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-AO">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Área do Aluno - LEGWER'S</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --bege: #FFF9EB;
-            --azul-medio: #6386AC;
-            --azul-escuro: #112E4A;
-            --vermelho: #C75450;
-            --verde: #50C78E;
-            --branco: #FFFFFF;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bege);
-            color: var(--azul-escuro);
-            line-height: 1.6;
-        }
-
-        /* Navegação */
-        nav {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            background: rgba(255, 249, 235, 0.98);
-            z-index: 1000;
-            padding: 1rem 5%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid var(--azul-medio);
-            box-shadow: 0 2px 10px rgba(17, 46, 74, 0.1);
-        }
-
-        .logo {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--azul-escuro);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .logo-icon {
-            width: 35px;
-            height: 35px;
-            background: var(--azul-escuro);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--bege);
-            font-size: 1rem;
-        }
-
-        .btn-back {
-            padding: 0.5rem 1.5rem;
-            border-radius: 20px;
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 0.85rem;
-            transition: all 0.3s ease;
-            border: 2px solid var(--azul-escuro);
-            color: var(--azul-escuro);
-            background: transparent;
-        }
-
-        .btn-back:hover {
-            background: var(--azul-escuro);
-            color: var(--bege);
-        }
-
-        /* Container de Login */
-        .tela-login {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 8rem 5% 4rem;
-        }
-
-        .tela-login.escondido {
-            display: none;
-        }
-
-        .auth-card {
-            background: var(--branco);
-            border-radius: 30px;
-            box-shadow: 0 20px 60px rgba(17, 46, 74, 0.15);
-            max-width: 480px;
-            width: 100%;
-            padding: 3rem;
-            border: 2px solid rgba(99, 134, 172, 0.1);
-        }
-
-        .auth-header {
-            text-align: center;
-            margin-bottom: 2.5rem;
-        }
-
-        .auth-icon {
-            width: 70px;
-            height: 70px;
-            background: var(--bege);
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            margin: 0 auto 1.5rem;
-            border: 3px solid var(--azul-medio);
-        }
-
-        .auth-header h1 {
-            font-family: 'Playfair Display', serif;
-            font-size: 2.2rem;
-            color: var(--azul-escuro);
-            margin-bottom: 0.5rem;
-        }
-
-        .auth-header p {
-            color: var(--azul-escuro);
-            opacity: 0.7;
-            font-size: 0.95rem;
-        }
-
-        /* Alerta de erro */
-        .alerta-erro {
-            background: var(--vermelho);
-            color: white;
-            padding: 1rem;
-            border-radius: 12px;
-            margin-bottom: 1.5rem;
-            display: none;
-        }
-
-        .alerta-erro.ativo {
-            display: block;
-            animation: shake 0.5s ease;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-10px); }
-            75% { transform: translateX(10px); }
-        }
-
-        /* Abas */
-        .auth-tabs {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            border-bottom: 2px solid rgba(99, 134, 172, 0.2);
-        }
-
-        .auth-tab {
-            flex: 1;
-            padding: 0.8rem;
-            background: transparent;
-            border: none;
-            font-family: 'Inter', sans-serif;
-            font-weight: 600;
-            font-size: 0.95rem;
-            color: var(--azul-escuro);
-            opacity: 0.5;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border-bottom: 3px solid transparent;
-            margin-bottom: -2px;
-        }
-
-        .auth-tab.active {
-            opacity: 1;
-            border-bottom-color: var(--azul-medio);
-        }
-
-        /* Formulários */
-        .auth-form {
-            display: none;
-        }
-
-        .auth-form.ativo {
-            display: block;
-            animation: fadeIn 0.4s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: var(--azul-escuro);
-            font-weight: 500;
-            font-size: 0.9rem;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 0.9rem 1.2rem;
-            border: 2px solid rgba(99, 134, 172, 0.3);
-            border-radius: 12px;
-            font-family: 'Inter', sans-serif;
-            font-size: 0.95rem;
-            color: var(--azul-escuro);
-            background: var(--bege);
-            transition: all 0.3s ease;
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: var(--azul-medio);
-            background: var(--branco);
-            box-shadow: 0 0 0 4px rgba(99, 134, 172, 0.1);
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
-
-        .btn-submit {
-            width: 100%;
-            padding: 1rem;
-            background: var(--azul-escuro);
-            color: var(--bege);
-            border: none;
-            border-radius: 12px;
-            font-family: 'Inter', sans-serif;
-            font-weight: 600;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 1rem;
-        }
-
-        .btn-submit:hover {
-            background: var(--azul-medio);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(17, 46, 74, 0.2);
-        }
-
-        .forgot-password {
-            text-align: center;
-            margin-top: 1rem;
-        }
-
-        .forgot-password a {
-            color: var(--azul-medio);
-            text-decoration: none;
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
-
-        .forgot-password a:hover {
-            color: var(--azul-escuro);
-            text-decoration: underline;
-        }
-
-        /* DASHBOARD - Inicialmente escondido */
-        .tela-dashboard {
-            display: none;
-            padding: 8rem 5% 4rem;
-            min-height: 100vh;
-        }
-
-        .tela-dashboard.ativo {
-            display: block;
-            animation: fadeIn 0.6s ease;
-        }
-
-        .dashboard-header {
-            text-align: center;
-            margin-bottom: 3rem;
-        }
-
-        .welcome-tag {
-            display: inline-block;
-            padding: 0.4rem 1rem;
-            background: rgba(99, 134, 172, 0.15);
-            color: var(--azul-escuro);
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-        }
-
-        .dashboard-header h1 {
-            font-family: 'Playfair Display', serif;
-            font-size: 3rem;
-            color: var(--azul-escuro);
-            margin-bottom: 0.5rem;
-        }
-
-        .dashboard-header p {
-            color: var(--azul-escuro);
-            opacity: 0.7;
-            font-size: 1.1rem;
-        }
-
-        /* User Header */
-        .user-header {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 1.5rem 2rem;
-            background: var(--branco);
-            border-radius: 16px;
-            margin-bottom: 2rem;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .user-avatar {
-            width: 60px;
-            height: 60px;
-            background: var(--azul-escuro);
-            color: var(--bege);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.8rem;
-        }
-
-        .user-info h3 {
-            font-family: 'Playfair Display', serif;
-            margin-bottom: 0.2rem;
-        }
-
-        .user-info p {
-            font-size: 0.9rem;
-            color: var(--azul-medio);
-        }
-
-        /* Botão Repositório */
-        .btn-repositorio {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 1.2rem 2.5rem;
-            background: var(--verde);
-            color: white;
-            text-decoration: none;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 1.1rem;
-            margin: 2rem 0;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(80, 199, 142, 0.3);
-        }
-
-        .btn-repositorio:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(80, 199, 142, 0.4);
-        }
-
-        /* Cursos */
-        .courses-container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .courses-container h2 {
-            font-family: 'Playfair Display', serif;
-            margin-bottom: 1.5rem;
-            color: var(--azul-escuro);
-            text-align: center;
-        }
-
-        .courses-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 2rem;
-        }
-
-        .course-card {
-            background: var(--branco);
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(17, 46, 74, 0.1);
-            transition: all 0.3s ease;
-        }
-
-        .course-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(17, 46, 74, 0.15);
-        }
-
-        .course-header {
-            padding: 1.5rem;
-            background: linear-gradient(135deg, var(--azul-escuro) 0%, var(--azul-medio) 100%);
-            color: var(--bege);
-        }
-
-        .course-icon {
-            width: 50px;
-            height: 50px;
-            background: rgba(255, 249, 235, 0.2);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .course-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.3rem;
-            margin-bottom: 0.3rem;
-        }
-
-        .course-subtitle {
-            opacity: 0.9;
-            font-size: 0.85rem;
-        }
-
-        .course-body {
-            padding: 1.5rem;
-        }
-
-        .course-stats {
-            display: flex;
-            gap: 2rem;
-            margin-bottom: 1rem;
-        }
-
-        .stat {
-            text-align: center;
-        }
-
-        .stat-value {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--azul-escuro);
-        }
-
-        .stat-label {
-            font-size: 0.75rem;
-            color: var(--azul-medio);
-            text-transform: uppercase;
-        }
-
-        .btn-access {
-            display: inline-block;
-            padding: 0.7rem 1.5rem;
-            background: var(--azul-escuro);
-            color: var(--bege);
-            text-decoration: none;
-            border-radius: 10px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            transition: all 0.3s;
-        }
-
-        .btn-access:hover {
-            background: var(--azul-medio);
-        }
-
-        /* Logout */
-        .logout-btn {
-            padding: 0.8rem 2rem;
-            background: transparent;
-            color: var(--azul-escuro);
-            border: 2px solid var(--azul-escuro);
-            border-radius: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-top: 2rem;
-        }
-
-        .logout-btn:hover {
-            background: var(--azul-escuro);
-            color: var(--bege);
-        }
-
-        @media (max-width: 768px) {
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-            
-            .courses-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Configurações - PR Info</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Configuração e Auth - CAMINHOS CORRETOS -->
+  <script src="supabase-config.js"></script>
+  <script src="auth.js"></script>
+  <style>
+    :root { --primary:#00b894; --primary-dark:#00a381; --bg-main:#f5f3ee; --bg-card:#fff; --text-dark:#2d3436; --text-medium:#636e72; --border:#e8e4dc; --radius:14px; --danger:#ef4444 }
+    :root.dark-mode { --bg-main:#1a1a1a; --bg-card:#2a2a2a; --text-dark:#fff; --text-medium:#b0b0b0; --border:#3a3a3a }
+    * { margin:0; padding:0; box-sizing:border-box }
+    body { font-family:'Segoe UI',sans-serif; background:var(--bg-main); color:var(--text-dark); min-height:100vh }
+    .settings-container { display:flex; min-height:100vh }
+    .settings-sidebar { width:280px; background:var(--bg-card); border-right:1px solid var(--border); padding:30px 20px; position:fixed; height:100vh }
+    .sidebar-logo { display:flex; align-items:center; gap:12px; margin-bottom:40px; padding-bottom:20px; border-bottom:1px solid var(--border) }
+    .sidebar-logo .logo-icon { width:44px; height:44px; background:linear-gradient(135deg,var(--primary),var(--primary-dark)); border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:700; color:#fff }
+    .sidebar-logo .logo-text { font-size:20px; font-weight:700 }
+    .sidebar-logo .logo-text span { color:var(--primary) }
+    .settings-nav-item { padding:16px 20px; border-radius:var(--radius); cursor:pointer; display:flex; align-items:center; gap:12px; margin-bottom:8px; color:var(--text-medium); transition:all .3s }
+    .settings-nav-item:hover { background:rgba(0,184,148,.05); color:var(--primary) }
+    .settings-nav-item.active { background:linear-gradient(135deg,rgba(0,184,148,.15),rgba(0,184,148,.05)); color:var(--primary); font-weight:600; border-left:3px solid var(--primary) }
+    .settings-nav-item i { width:20px; text-align:center }
+    .nav-divider { margin:20px 0; border:0; border-top:1px solid var(--border) }
+    .settings-content { flex:1; padding:40px; margin-left:280px }
+    .card-settings { background:var(--bg-card); padding:40px; border-radius:20px; box-shadow:0 2px 12px rgba(0,0,0,.07); max-width:900px; margin:0 auto; animation:fadeIn .4s }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+    .section-title { margin-bottom:30px; font-size:24px; font-weight:700; padding-bottom:15px; border-bottom:2px solid var(--border) }
+    .info-grid-vertical { display:flex; flex-direction:column; gap:16px }
+    .input-group { display:flex; flex-direction:column; gap:8px; margin-bottom:20px }
+    .input-group label { font-size:13px; font-weight:600; text-transform:uppercase; letter-spacing:.5px; color:var(--text-medium) }
+    .input-group input, .input-group select { padding:14px 16px; border:1.5px solid var(--border); border-radius:var(--radius); font-size:14px; background:var(--bg-main); color:var(--text-dark) }
+    .input-group input:focus { border-color:var(--primary); outline:none }
+    .btn-group { display:flex; gap:12px; margin-top:30px }
+    .btn { padding:14px 28px; border-radius:var(--radius); font-size:14px; font-weight:600; cursor:pointer; border:none; display:inline-flex; align-items:center; gap:8px }
+    .btn-primary { background:linear-gradient(135deg,var(--primary),var(--primary-dark)); color:#fff }
+    .btn-primary:hover:not(:disabled) { transform:translateY(-2px) }
+    .btn-primary:disabled { opacity:.5; cursor:not-allowed }
+    .btn-secondary { background:var(--bg-card); color:var(--text-dark); border:1.5px solid var(--border) }
+    .loading-state { text-align:center; padding:60px 20px; color:var(--text-medium) }
+    .loading-state i { font-size:40px; margin-bottom:16px; color:var(--primary); animation:spin 1s linear infinite }
+    @keyframes spin { to{transform:rotate(360deg)} }
+    .error-state { text-align:center; padding:60px 20px; color:var(--danger) }
+    .error-state i { font-size:40px; margin-bottom:16px }
+    .error-state p { margin:10px 0; font-size:14px }
+    .toast { position:fixed; bottom:28px; right:28px; background:var(--primary); color:#fff; padding:14px 22px; border-radius:var(--radius); font-weight:600; display:none; align-items:center; gap:10px; z-index:3000; animation:slideIn .4s }
+    .toast.show { display:flex }
+    .toast.error { background:var(--danger) }
+    @keyframes slideIn { from{transform:translateX(80px);opacity:0} to{transform:translateX(0);opacity:1} }
+    @media(max-width:992px){ .settings-sidebar{width:80px;padding:20px 10px} .sidebar-logo .logo-text,.settings-nav-item span{display:none} .settings-nav-item{justify-content:center} .settings-content{margin-left:80px} }
+    @media(max-width:768px){ .settings-sidebar{width:100%;height:auto;position:relative} .settings-content{margin-left:0} }
+  </style>
 </head>
 <body>
-    <!-- NAVEGAÇÃO -->
-    <nav>
-        <a href="index.html" class="logo">
-            <div class="logo-icon">📚</div>
-            LEGWER'S
-        </a>
-        <a href="index.html" class="btn-back">← Voltar ao Início</a>
-    </nav>
+  <div class="settings-container">
+    <!-- SIDEBAR -->
+    <aside class="settings-sidebar">
+      <div class="sidebar-logo">
+        <div class="logo-icon">PR</div>
+        <span class="logo-text">PR <span>info</span></span>
+      </div>
+      <div class="settings-nav-item active" onclick="switchTab('perfil')" id="nav-perfil"><i class="fas fa-user-circle"></i><span>Perfil</span></div>
+      <div class="settings-nav-item" onclick="switchTab('seguranca')" id="nav-seguranca"><i class="fas fa-shield-alt"></i><span>Segurança</span></div>
+      <hr class="nav-divider">
+      <div class="settings-nav-item" onclick="window.location.href='index.html'"><i class="fas fa-arrow-left"></i><span>Voltar</span></div>
+    </aside>
 
-    <!-- ========================================== -->
-    <!-- TELA DE LOGIN (mostrada inicialmente) -->
-    <!-- ========================================== -->
-    <div class="tela-login" id="telaLogin">
-        <div class="auth-card">
-            <div class="auth-header">
-                <div class="auth-icon">🔐</div>
-                <h1>Área do Aluno</h1>
-                <p>Acesse seus cursos e materiais acadêmicos</p>
-            </div>
-
-            <!-- Alerta de erro -->
-            <div class="alerta-erro" id="alertaErro">
-                ⚠️ Email ou senha incorretos
-            </div>
-
-            <!-- Abas -->
-            <div class="auth-tabs">
-                <button class="auth-tab active" onclick="mostrarAba('login')">Entrar</button>
-                <button class="auth-tab" onclick="mostrarAba('cadastro')">Criar Conta</button>
-            </div>
-
-            <!-- Formulário de Login -->
-            <form class="auth-form ativo" id="formLogin" onsubmit="fazerLogin(event)">
-                <div class="form-group">
-                    <label class="form-label">Email Institucional</label>
-                    <input type="email" class="form-input" id="loginEmail" placeholder="aluno@legwers.edu" required>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Senha</label>
-                    <input type="password" class="form-input" id="loginSenha" placeholder="Digite sua senha" required>
-                </div>
-
-                <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem;">
-                    <input type="checkbox" id="lembrarMe" style="width: auto;">
-                    <label for="lembrarMe" style="margin: 0; font-weight: normal;">Lembrar-me</label>
-                </div>
-
-                <button type="submit" class="btn-submit">Entrar na Plataforma</button>
-
-                <div class="forgot-password">
-                    <a href="#" onclick="alert('Contate o suporte técnico')">Esqueceu sua senha?</a>
-                </div>
-            </form>
-
-            <!-- Formulário de Cadastro -->
-            <form class="auth-form" id="formCadastro" onsubmit="fazerCadastro(event)">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">Nome</label>
-                        <input type="text" class="form-input" id="cadNome" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Sobrenome</label>
-                        <input type="text" class="form-input" id="cadSobrenome" required>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Email</label>
-                    <input type="email" class="form-input" id="cadEmail" required>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">Matrícula</label>
-                        <input type="text" class="form-input" id="cadMatricula" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Curso</label>
-                        <select class="form-input" id="cadCurso" required>
-                            <option value="">Selecione...</option>
-                            <option value="Ciência da Computação">Ciência da Computação</option>
-                            <option value="Engenharia">Engenharia</option>
-                            <option value="Medicina">Medicina</option>
-                            <option value="Direito">Direito</option>
-                            <option value="Psicologia">Psicologia</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label">Senha</label>
-                        <input type="password" class="form-input" id="cadSenha" minlength="6" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Confirmar Senha</label>
-                        <input type="password" class="form-input" id="cadConfirmar" required>
-                    </div>
-                </div>
-
-                <button type="submit" class="btn-submit">Criar Conta</button>
-            </form>
+    <!-- CONTEÚDO -->
+    <main class="settings-content">
+      <div id="tab-perfil" class="card-settings">
+        <h2 class="section-title">👤 Perfil do Utilizador</h2>
+        <div id="perfil-loading" class="loading-state">
+          <i class="fas fa-circle-notch fa-spin"></i><br>
+          <strong>A carregar dados...</strong>
         </div>
-    </div>
-
-    <!-- ========================================== -->
-    <!-- TELA DO DASHBOARD (escondida inicialmente) -->
-    <!-- ========================================== -->
-    <div class="tela-dashboard" id="telaDashboard">
-        <div class="dashboard-header">
-            <span class="welcome-tag">BEM-VINDO</span>
-            <h1>Olá, <span id="nomeUsuario">Aluno</span>!</h1>
-            <p>Pronto para acessar o conhecimento?</p>
+        <div id="perfil-error" class="error-state" style="display:none">
+          <i class="fas fa-exclamation-triangle"></i><br>
+          <strong>Erro ao carregar</strong><br>
+          <p id="error-msg"></p>
+          <button class="btn btn-primary" onclick="location.reload()">🔄 Tentar</button>
         </div>
+        <form id="form-perfil" style="display:none">
+          <div class="info-grid-vertical">
+            <div class="input-group"><label>Nome Completo</label><input type="text" id="perfil-nome" required></div>
+            <div class="input-group"><label>Email</label><input type="email" id="perfil-email" required></div>
+            <div class="input-group"><label>Telefone</label><input type="tel" id="perfil-telefone"></div>
+            <div class="input-group"><label>NIF/BI</label><input type="text" id="perfil-nif"></div>
+          </div>
+          <div class="btn-group">
+            <button type="button" class="btn btn-secondary" onclick="resetPerfil()">↺ Repor</button>
+            <button type="submit" class="btn btn-primary" id="btn-save">✓ Guardar</button>
+          </div>
+        </form>
+      </div>
 
-        <!-- Info do usuário -->
-        <div class="user-header">
-            <div class="user-avatar">👤</div>
-            <div class="user-info">
-                <h3 id="nomeCompleto">Nome do Aluno</h3>
-                <p id="emailUsuario">email@estudante.edu</p>
-                <p>Matrícula: <span id="matriculaUsuario">000000</span> | Curso: <span id="cursoUsuario">Curso</span></p>
-            </div>
+      <div id="tab-seguranca" class="card-settings" style="display:none">
+        <h2 class="section-title">🔐 Segurança</h2>
+        <div class="info-grid-vertical">
+          <div class="input-group"><label>Senha Actual</label><input type="password" id="seg-pass-atual"></div>
+          <div class="input-group"><label>Nova Senha</label><input type="password" id="seg-nova-pass"></div>
+          <div class="input-group"><label>Confirmar Nova Senha</label><input type="password" id="seg-confirm"></div>
         </div>
-
-        <!-- Botão principal -->
-        <div style="text-align: center;">
-            <a href="areas.html" class="btn-repositorio">
-                📚 Acessar Repositório de Documentos →
-            </a>
-            <p style="color: var(--azul-medio); margin-top: 1rem;">
-                Explore artigos, teses e materiais acadêmicos
-            </p>
+        <div class="btn-group">
+          <button type="button" class="btn btn-primary" onclick="updatePassword()">🔒 Actualizar Senha</button>
         </div>
+      </div>
+    </main>
+  </div>
 
-        <!-- Cursos -->
-        <div class="courses-container" style="margin-top: 3rem;">
-            <h2>Seus Cursos</h2>
-            <div class="courses-grid" id="gridCursos">
-                <!-- Preenchido via JS -->
-            </div>
-        </div>
+  <div class="toast" id="toast"><i class="fas fa-check-circle"></i><span id="toast-msg"></span></div>
 
-        <div style="text-align: center;">
-            <button class="logout-btn" onclick="sair()">Sair da Conta</button>
-        </div>
-    </div>
+  <script>
+    // ==================== ESTADO ====================
+    let currentUser = null;
+    let userSettings = null;
 
-    <!-- ========================================== -->
-    <!-- JAVASCRIPT (tudo em um lugar) -->
-    <!-- ========================================== -->
-    <script>
-        // ==========================================
-        // DADOS E CONFIGURAÇÃO
-        // ==========================================
-        
-        // Usuário de teste (para login funcionar sem cadastro)
-        const USUARIO_TESTE = {
-            nome: 'João Silva',
-            email: 'aluno@legwers.edu',
-            senha: '123456',
-            matricula: '202400001',
-            curso: 'Ciência da Computação'
+    // ==================== INICIALIZAÇÃO ====================
+    window.addEventListener('load', async () => {
+      console.log('🚀 Configurações a iniciar...');
+      
+      // Verificar sessão
+      if (typeof isLoggedIn !== 'function' || !isLoggedIn()) {
+        console.log('❌ Não logado, redirecionando...');
+        window.location.href = 'login.html';
+        return;
+      }
+
+      const localUser = JSON.parse(localStorage.getItem('prinfo_user') || '{}');
+      console.log('👤 User local:', localUser);
+      
+      if (!localUser.id) {
+        window.location.href = 'login.html';
+        return;
+      }
+
+      // Mostrar loading
+      document.getElementById('perfil-loading').style.display = 'block';
+      document.getElementById('form-perfil').style.display = 'none';
+      document.getElementById('perfil-error').style.display = 'none';
+
+      try {
+        // Verificar Supabase
+        if (typeof supabase === 'undefined') {
+          throw new Error('Supabase não carregado. Verifique internet.');
+        }
+
+        // Buscar dados
+        const {  userData, error } = await supabase
+          .from('users')
+          .select('*')
+          .eq('id', localUser.id)
+          .single();
+
+        if (error || !userData) throw new Error('Usuário não encontrado');
+
+        currentUser = userData;
+        console.log('✅ Dados carregados:', currentUser.full_name);
+
+        // Preencher formulário
+        document.getElementById('perfil-nome').value = currentUser.full_name || '';
+        document.getElementById('perfil-email').value = currentUser.email || '';
+        document.getElementById('perfil-telefone').value = currentUser.phone || '';
+        document.getElementById('perfil-nif').value = currentUser.nif_or_bi || '';
+
+        // Esconder loading, mostrar form
+        document.getElementById('perfil-loading').style.display = 'none';
+        document.getElementById('form-perfil').style.display = 'block';
+
+        showToast('success', `Bem-vindo, ${currentUser.full_name.split(' ')[0]}!`);
+
+      } catch (err) {
+        console.error('❌ Erro:', err);
+        document.getElementById('perfil-loading').style.display = 'none';
+        document.getElementById('perfil-error').style.display = 'block';
+        document.getElementById('error-msg').textContent = err.message;
+        showToast('error', 'Erro ao carregar dados');
+      }
+    });
+
+    // ==================== NAVEGAÇÃO ====================
+    function switchTab(tab) {
+      console.log('Mudando para:', tab);
+      // Esconder todas
+      document.getElementById('tab-perfil').style.display = 'none';
+      document.getElementById('tab-seguranca').style.display = 'none';
+      document.getElementById('nav-perfil').classList.remove('active');
+      document.getElementById('nav-seguranca').classList.remove('active');
+      
+      // Mostrar seleccionada
+      document.getElementById('tab-' + tab).style.display = 'block';
+      document.getElementById('nav-' + tab).classList.add('active');
+    }
+
+    // ==================== PERFIL ====================
+    function resetPerfil() {
+      if (currentUser) {
+        document.getElementById('perfil-nome').value = currentUser.full_name || '';
+        document.getElementById('perfil-email').value = currentUser.email || '';
+        document.getElementById('perfil-telefone').value = currentUser.phone || '';
+        document.getElementById('perfil-nif').value = currentUser.nif_or_bi || '';
+      }
+      showToast('success', 'Dados repostos');
+    }
+
+    document.getElementById('form-perfil').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('btn-save');
+      const original = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> A guardar...';
+
+      try {
+        const { error } = await supabase
+          .from('users')
+          .update({
+            full_name: document.getElementById('perfil-nome').value.trim(),
+            email: document.getElementById('perfil-email').value.trim().toLowerCase(),
+            phone: document.getElementById('perfil-telefone').value.trim(),
+            nif_or_bi: document.getElementById('perfil-nif').value.trim()
+          })
+          .eq('id', currentUser.id);
+
+        if (error) throw error;
+
+        // Actualizar localStorage
+        const updated = { ...currentUser,
+          full_name: document.getElementById('perfil-nome').value,
+          email: document.getElementById('perfil-email').value,
+          phone: document.getElementById('perfil-telefone').value,
+          nif_or_bi: document.getElementById('perfil-nif').value
         };
+        localStorage.setItem('prinfo_user', JSON.stringify(updated));
+        currentUser = updated;
 
-        // ==========================================
-        // FUNÇÕES DE TELA
-        // ==========================================
+        showToast('success', '✅ Perfil actualizado!');
+      } catch (err) {
+        console.error('Erro:', err);
+        showToast('error', 'Erro ao guardar: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = original;
+      }
+    });
 
-        function mostrarAba(aba) {
-            const formLogin = document.getElementById('formLogin');
-            const formCadastro = document.getElementById('formCadastro');
-            const tabs = document.querySelectorAll('.auth-tab');
+    // ==================== SENHA ====================
+    async function updatePassword() {
+      const actual = document.getElementById('seg-pass-atual').value;
+      const nova = document.getElementById('seg-nova-pass').value;
+      const confirm = document.getElementById('seg-confirm').value;
 
-            // Esconde alerta
-            document.getElementById('alertaErro').classList.remove('ativo');
+      if (!actual) { showToast('error', 'Digite senha actual'); return; }
+      if (nova && nova.length < 8) { showToast('error', 'Mínimo 8 caracteres'); return; }
+      if (nova !== confirm) { showToast('error', 'Senhas não coincidem'); return; }
 
-            if (aba === 'login') {
-                formLogin.classList.add('ativo');
-                formCadastro.classList.remove('ativo');
-                tabs[0].classList.add('active');
-                tabs[1].classList.remove('active');
-            } else {
-                formLogin.classList.remove('ativo');
-                formCadastro.classList.add('ativo');
-                tabs[0].classList.remove('active');
-                tabs[1].classList.add('active');
-            }
+      try {
+        // Verificar senha actual
+        const hashActual = await hashPassword(actual);
+        if (hashActual !== currentUser.password_hash) {
+          throw new Error('Senha actual incorrecta');
         }
 
-        function mostrarLogin() {
-            document.getElementById('telaLogin').classList.remove('escondido');
-            document.getElementById('telaDashboard').classList.remove('ativo');
+        // Actualizar
+        if (nova) {
+          const novoHash = await hashPassword(nova);
+          const { error } = await supabase
+            .from('users')
+            .update({ password_hash: novoHash })
+            .eq('id', currentUser.id);
+          
+          if (error) throw error;
         }
 
-        function mostrarDashboard(usuario) {
-            document.getElementById('telaLogin').classList.add('escondido');
-            document.getElementById('telaDashboard').classList.add('ativo');
+        showToast('success', '✅ Senha actualizada!');
+        document.getElementById('seg-pass-atual').value = '';
+        document.getElementById('seg-nova-pass').value = '';
+        document.getElementById('seg-confirm').value = '';
+      } catch (err) {
+        showToast('error', err.message);
+      }
+    }
 
-            // Preenche dados
-            document.getElementById('nomeUsuario').textContent = usuario.nome.split(' ')[0];
-            document.getElementById('nomeCompleto').textContent = usuario.nome;
-            document.getElementById('emailUsuario').textContent = usuario.email;
-            document.getElementById('matriculaUsuario').textContent = usuario.matricula;
-            document.getElementById('cursoUsuario').textContent = usuario.curso;
+    // ==================== UTILITÁRIOS ====================
+    async function hashPassword(password) {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(password);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2,'0')).join('');
+    }
 
-            // Carrega cursos
-            carregarCursos(usuario.curso);
-        }
+    function showToast(type, msg) {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toast-msg');
+      toast.className = 'toast show ' + (type === 'error' ? 'error' : '');
+      toastMsg.textContent = msg;
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
 
-        // ==========================================
-        // LOGIN E CADASTRO
-        // ==========================================
-
-        function fazerLogin(event) {
-            event.preventDefault();
-            
-            const email = document.getElementById('loginEmail').value;
-            const senha = document.getElementById('loginSenha').value;
-            const lembrar = document.getElementById('lembrarMe').checked;
-
-            // Verifica usuário de teste OU usuários cadastrados
-            let usuarios = JSON.parse(localStorage.getItem('usuarios') || '[]');
-            usuarios.push(USUARIO_TESTE); // Sempre permite login de teste
-            
-            const usuario = usuarios.find(u => u.email === email && u.senha === senha);
-
-            if (usuario) {
-                // Salva sessão
-                const sessao = {
-                    ...usuario,
-                    loginEm: new Date().toISOString()
-                };
-                
-                if (lembrar) {
-                    localStorage.setItem('sessao', JSON.stringify(sessao));
-                } else {
-                    sessionStorage.setItem('sessao', JSON.stringify(sessao));
-                }
-
-                mostrarDashboard(usuario);
-                
-            } else {
-                document.getElementById('alertaErro').classList.add('ativo');
-            }
-        }
-
-        function fazerCadastro(event) {
-            event.preventDefault();
-            
-            const senha = document.getElementById('cadSenha').value;
-            const confirmar = document.getElementById('cadConfirmar').value;
-
-            if (senha !== confirmar) {
-                alert('As senhas não coincidem!');
-                return;
-            }
-
-            const novoUsuario = {
-                nome: document.getElementById('cadNome').value + ' ' + document.getElementById('cadSobrenome').value,
-                email: document.getElementById('cadEmail').value,
-                senha: senha,
-                matricula: document.getElementById('cadMatricula').value,
-                curso: document.getElementById('cadCurso').value
-            };
-
-            // Salva
-            let usuarios = JSON.parse(localStorage.getItem('usuarios') || '[]');
-            usuarios.push(novoUsuario);
-            localStorage.setItem('usuarios', JSON.stringify(usuarios));
-
-            alert('Conta criada! Faça login.');
-            mostrarAba('login');
-            document.getElementById('loginEmail').value = novoUsuario.email;
-        }
-
-        function sair() {
-            localStorage.removeItem('sessao');
-            sessionStorage.removeItem('sessao');
-            mostrarLogin();
-        }
-
-        // ==========================================
-        // CARREGAR CURSOS
-        // ==========================================
-
-        function carregarCursos(curso) {
-            const cursosMap = {
-                'Ciência da Computação': [
-                    { icone: '💻', nome: 'Algoritmos', area: 'Ciências Exatas', artigos: 24, areaId: 1 },
-                    { icone: '🤖', nome: 'Inteligência Artificial', area: 'Ciências Exatas', artigos: 18, areaId: 1 },
-                    { icone: '📊', nome: 'Banco de Dados', area: 'Ciências Exatas', artigos: 15, areaId: 1 }
-                ],
-                'Engenharia': [
-                    { icone: '🏗️', nome: 'Estruturas', area: 'Ciências Exatas', artigos: 20, areaId: 1 },
-                    { icone: '📐', nome: 'Materiais', area: 'Ciências Exatas', artigos: 12, areaId: 1 }
-                ],
-                'Medicina': [
-                    { icone: '🧬', nome: 'Anatomia', area: 'Ciências Biológicas', artigos: 30, areaId: 2 },
-                    { icone: '❤️', nome: 'Cardiologia', area: 'Ciências Biológicas', artigos: 22, areaId: 2 }
-                ],
-                'Direito': [
-                    { icone: '⚖️', nome: 'Direito Constitucional', area: 'Ciências Sociais', artigos: 25, areaId: 4 },
-                    { icone: '📜', nome: 'Direito Civil', area: 'Ciências Sociais', artigos: 20, areaId: 4 }
-                ],
-                'Psicologia': [
-                    { icone: '🧠', nome: 'Psicologia Cognitiva', area: 'Ciências Humanas', artigos: 18, areaId: 3 },
-                    { icone: '💬', nome: 'Psicologia Social', area: 'Ciências Humanas', artigos: 15, areaId: 3 }
-                ]
-            };
-
-            const cursos = cursosMap[curso] || cursosMap['Ciência da Computação'];
-            
-            document.getElementById('gridCursos').innerHTML = cursos.map(c => `
-                <div class="course-card">
-                    <div class="course-header">
-                        <div class="course-icon">${c.icone}</div>
-                        <h3 class="course-title">${c.nome}</h3>
-                        <p class="course-subtitle">${c.area}</p>
-                    </div>
-                    <div class="course-body">
-                        <div class="course-stats">
-                            <div class="stat">
-                                <span class="stat-value">${c.artigos}</span>
-                                <span class="stat-label">Artigos</span>
-                            </div>
-                        </div>
-                        <a href="areas.html?area=${c.areaId}" class="btn-access">Acessar →</a>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // ==========================================
-        // INICIALIZAÇÃO
-        // ==========================================
-
-        // Verifica se já está logado
-        const sessao = JSON.parse(localStorage.getItem('sessao') || sessionStorage.getItem('sessao') || 'null');
-        
-        if (sessao) {
-            mostrarDashboard(sessao);
-        } else {
-            mostrarLogin();
-        }
-
-        // Verifica erro de não autenticado na URL
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('erro') === 'nao_autenticado') {
-            document.getElementById('alertaErro').textContent = '⚠️ Faça login para acessar o repositório';
-            document.getElementById('alertaErro').classList.add('ativo');
-        }
-    </script>
+    function logout() {
+      localStorage.removeItem('prinfo_user');
+      localStorage.removeItem('prinfo_logged_in');
+      window.location.href = 'login.html';
+    }
+  </script>
 </body>
 </html>
