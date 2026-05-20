@@ -1,145 +1,221 @@
 // ============================================
-// SISTEMA DE AUTENTICAÇÃO - LEGWER'S
+// PR INFO - AUTH.JS
+// Sistema de Autenticação Simples
 // ============================================
 
-const AUTH_CONFIG = {
-    SESSION_KEY: 'legwers_session',
-    USER_KEY: 'legwers_user',
-    SESSION_DURATION: 24 * 60 * 60 * 1000 // 24 horas
-};
-
 // ============================================
-// FUNÇÕES DE AUTENTICAÇÃO
+// 1. LOGIN
 // ============================================
+async function login(email, password) {
+  console.log('🔐 Login tentando:', email);
 
-function fazerLogin(email, senha, lembrar = false) {
-    // Simula autenticação (substituir por API real)
-    const usuarios = JSON.parse(localStorage.getItem('legwers_usuarios') || '[]');
-    
-    // Usuário de teste se não houver cadastrados
-    const usuarioTeste = {
-        id: 1,
-        nome: 'Aluno Teste',
-        email: 'aluno@legwers.edu',
-        senha: '123456', // Em produção, senha seria hash
-        matricula: '202400001',
-        curso: 'Ciência da Computação'
+  try {
+    // Hash da senha
+    const passwordHash = await hashPassword(password);
+
+    // Busca usuário na base de dados
+    const { data, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('email', email.toLowerCase().trim())
+      .eq('password_hash', passwordHash)
+      .eq('is_active', true)
+      .single();
+
+    if (error || !data) {
+      console.error('❌ Login falhou:', error?.message || 'Usuário não encontrado');
+      return { 
+        success: false, 
+        message: 'Email ou senha inválidos.' 
+      };
+    }
+
+    // Salva sessão no localStorage
+    const userSession = {
+      id: data.id,
+      name: data.full_name,
+      email: data.email,
+      role: data.course_role
     };
-    
-    const todosUsuarios = usuarios.length > 0 ? usuarios : [usuarioTeste];
-    
-    const usuario = todosUsuarios.find(u => u.email === email && u.senha === senha);
-    
-    if (!usuario) {
-        return { sucesso: false, erro: 'Email ou senha incorretos' };
-    }
-    
-    // Cria sessão
-    const sessao = {
-        id: usuario.id,
-        nome: usuario.nome,
-        email: usuario.email,
-        matricula: usuario.matricula,
-        curso: usuario.curso,
-        loginEm: new Date().toISOString(),
-        expiraEm: new Date(Date.now() + AUTH_CONFIG.SESSION_DURATION).toISOString()
+
+    localStorage.setItem('prinfo_user', JSON.stringify(userSession));
+    localStorage.setItem('prinfo_logged_in', 'true');
+
+    console.log('✅ Login bem-sucedido:', userSession);
+
+    return {
+      success: true,
+      message: 'Bem-vindo, ' + data.full_name.split(' ')[0] + '!',
+      user: userSession
     };
-    
-    // Salva sessão
-    if (lembrar) {
-        localStorage.setItem(AUTH_CONFIG.SESSION_KEY, JSON.stringify(sessao));
-    } else {
-        sessionStorage.setItem(AUTH_CONFIG.SESSION_KEY, JSON.stringify(sessao));
-    }
-    
-    return { sucesso: true, usuario: sessao };
+
+  } catch (err) {
+    console.error('❌ Erro no login:', err);
+    return { 
+      success: false, 
+      message: 'Erro de conexão. Verifique sua internet.' 
+    };
+  }
 }
 
-function fazerLogout() {
-    localStorage.removeItem(AUTH_CONFIG.SESSION_KEY);
-    sessionStorage.removeItem(AUTH_CONFIG.SESSION_KEY);
-    localStorage.removeItem(AUTH_CONFIG.USER_KEY);
-    
-    // Redireciona para login
-    window.location.href = 'area-aluno.html';
-}
+// ============================================
+// 2. REGISTO (CRIAR CONTA)
+// ============================================
+async function register(formData) {
+  console.log('📝 Criando conta...', formData);
 
-function verificarAutenticacao() {
-    const sessao = JSON.parse(
-        localStorage.getItem(AUTH_CONFIG.SESSION_KEY) || 
-        sessionStorage.getItem(AUTH_CONFIG.SESSION_KEY) || 
-        'null'
-    );
-    
-    if (!sessao) {
-        return { autenticado: false };
-    }
-    
-    // Verifica se expirou
-    if (new Date() > new Date(sessao.expiraEm)) {
-        fazerLogout();
-        return { autenticado: false };
-    }
-    
-    return { autenticado: true, usuario: sessao };
-}
+  // Validação básica
+  if (!formData.nome || !formData.email || !formData.password) {
+    return { 
+      success: false, 
+      message: 'Preencha todos os campos obrigatórios.' 
+    };
+  }
 
-function protegerRota() {
-    const auth = verificarAutenticacao();
-    
-    if (!auth.autenticado) {
-        // Salva URL tentada para redirecionar após login
-        sessionStorage.setItem('redirect_apos_login', window.location.href);
-        
-        // Redireciona para login
-        window.location.href = 'area-aluno.html?erro=nao_autenticado';
-        return false;
-    }
-    
-    // Atualiza UI com dados do usuário
-    atualizarUIUsuario(auth.usuario);
-    return true;
-}
+  try {
+    // Cria hash da senha
+    const passwordHash = await hashPassword(formData.password);
 
-function atualizarUIUsuario(usuario) {
-    // Atualiza elementos com dados do usuário
-    const elementosNome = document.querySelectorAll('.user-nome');
-    const elementosEmail = document.querySelectorAll('.user-email');
-    
-    elementosNome.forEach(el => el.textContent = usuario.nome);
-    elementosEmail.forEach(el => el.textContent = usuario.email);
-}
-
-function cadastrarUsuario(dados) {
-    let usuarios = JSON.parse(localStorage.getItem('legwers_usuarios') || '[]');
-    
     // Verifica se email já existe
-    if (usuarios.find(u => u.email === dados.email)) {
-        return { sucesso: false, erro: 'Email já cadastrado' };
+    const { data: existingUser } = await supabase
+      .from('users')
+      .select('id')
+      .eq('email', formData.email.toLowerCase().trim())
+      .single();
+
+    if (existingUser) {
+      return { 
+        success: false, 
+        message: 'Este email já está registado.' 
+      };
     }
-    
-    const novoUsuario = {
-        id: Date.now(),
-        ...dados,
-        criadoEm: new Date().toISOString()
+
+    // Insere novo usuário
+    const { data, error } = await supabase
+      .from('users')
+      .insert({
+        email: formData.email.toLowerCase().trim(),
+        password_hash: passwordHash,
+        full_name: formData.nome.trim(),
+        phone: formData.phone || null,
+        nif_or_bi: formData.nif || null,
+        course_role: formData.curso || 'informatica',
+        nomination_year: parseInt(formData.ano) || new Date().getFullYear(),
+        is_active: true,
+        is_verified: true
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('❌ Erro ao criar usuário:', error);
+      throw error;
+    }
+
+    // Cria configurações padrão
+    await supabase
+      .from('user_settings')
+      .insert({
+        user_id: data.id,
+        theme: 'light',
+        language: 'pt-AO'
+      });
+
+    // Login automático após registo
+    const userSession = {
+      id: data.id,
+      name: data.full_name,
+      email: data.email,
+      role: data.course_role
     };
-    
-    usuarios.push(novoUsuario);
-    localStorage.setItem('legwers_usuarios', JSON.stringify(usuarios));
-    
-    return { sucesso: true, usuario: novoUsuario };
+
+    localStorage.setItem('prinfo_user', JSON.stringify(userSession));
+    localStorage.setItem('prinfo_logged_in', 'true');
+
+    console.log('✅ Conta criada e login realizado:', userSession);
+
+    return {
+      success: true,
+      message: 'Conta criada com sucesso!',
+      user: userSession
+    };
+
+  } catch (err) {
+    console.error('❌ Erro no registo:', err);
+    return { 
+      success: false, 
+      message: 'Erro ao criar conta: ' + err.message 
+    };
+  }
 }
 
 // ============================================
-// INICIALIZAÇÃO AUTOMÁTICA
+// 3. LOGOUT
 // ============================================
+function logout() {
+  console.log('👋 Fazendo logout...');
+  localStorage.removeItem('prinfo_user');
+  localStorage.removeItem('prinfo_logged_in');
+  window.location.href = 'login.html';
+}
 
-document.addEventListener('DOMContentLoaded', () => {
-    // Verifica se está em página protegida
-    const paginasProtegidas = ['areas.html', 'documento.html', 'favoritos.html'];
-    const paginaAtual = window.location.pathname.split('/').pop();
-    
-    if (paginasProtegidas.includes(paginaAtual)) {
-        protegerRota();
-    }
-});
+// ============================================
+// 4. VERIFICAR SE ESTÁ LOGADO
+// ============================================
+function isLoggedIn() {
+  const isLogged = localStorage.getItem('prinfo_logged_in') === 'true';
+  const user = localStorage.getItem('prinfo_user');
+  
+  console.log('🔍 isLoggedIn:', isLogged, user ? 'com usuário' : 'sem usuário');
+  
+  return isLogged && !!user;
+}
+
+// ============================================
+// 5. OBTER USUÁRIO ATUAL
+// ============================================
+function getCurrentUser() {
+  try {
+    const userStr = localStorage.getItem('prinfo_user');
+    return userStr ? JSON.parse(userStr) : null;
+  } catch (e) {
+    console.error('❌ Erro ao ler usuário:', e);
+    return null;
+  }
+}
+
+// ============================================
+// 6. PROTEGER PÁGINAS (REDIRECIONA SE NÃO LOGADO)
+// ============================================
+function requireAuth() {
+  if (!isLoggedIn()) {
+    console.log('⚠️ Usuário não autenticado, redirecionando...');
+    window.location.href = 'login.html';
+    return false;
+  }
+  console.log('✅ Usuário autenticado:', getCurrentUser());
+  return true;
+}
+
+// ============================================
+// 7. HASH DE SENHA (SHA-256)
+// ============================================
+async function hashPassword(password) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(password);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+// ============================================
+// 8. CONFIRMAÇÃO DE CARREGAMENTO
+// ============================================
+console.log('✅ auth.js carregado com sucesso!');
+console.log('🔐 Funções disponíveis:');
+console.log('   - login():', typeof login);
+console.log('   - register():', typeof register);
+console.log('   - logout():', typeof logout);
+console.log('   - isLoggedIn():', typeof isLoggedIn);
+console.log('   - getCurrentUser():', typeof getCurrentUser);
+console.log('   - requireAuth():', typeof requireAuth);
